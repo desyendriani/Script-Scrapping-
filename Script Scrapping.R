@@ -6,11 +6,6 @@ library(twitteR)
 library(ROAuth)
 library(RCurl)
 
-
-
-download.file(url="http://curl.haxx.se/ca/cacert.pem",destfile="cacert.pem")
-
-
 reqURL <- "https://api.twitter.com/oauth/request_token"
 accessURL <- "https://api.twitter.com/oauth/access_token"
 authURL <- "https://api.twitter.com/oauth/authorize"
