@@ -1,0 +1,114 @@
+import time
+import pandas as pd
+
+!pip install tweepy
+
+!pip install tweepy --upgrade
+
+import tweepy
+
+client = tweepy.Client(bearer_token = "AAAAAAAAAAAAAAAAAAAAADzHZgEAAAAATzwSRGLVQMn%2FlfknUiaWftPUYCg%3Dqyws7OS4Mye3FWpBwCKEUGyj8ODr1IJ49zCAIKC1toNPzOsJS1", wait_on_rate_limit=False)
+
+hoax_tweets[0].data[0]
+
+hoax_tweets[0].includes['users'][2]
+
+result = []
+user_dict = {}
+# Loop through each response object
+for response in hoax_tweets:
+    # Take all of the users, and put them into a dictionary of dictionaries with the info we want to keep
+    for user in response.includes['users']:
+        user_dict[user.id] = {'username': user.username, 
+                              'followers': user.public_metrics['followers_count'],
+                              'tweets': user.public_metrics['tweet_count'],
+                              'description': user.description,
+                              'location': user.location
+                             }
+    for tweet in response.data:
+        # For each tweet, find the author's information
+        author_info = user_dict[tweet.author_id]
+        # Put all of the information we want to keep in a single dictionary for each tweet
+        result.append({'author_id': tweet.author_id, 
+                       'username': author_info['username'],
+                       'author_followers': author_info['followers'],
+                       'author_tweets': author_info['tweets'],
+                       'author_description': author_info['description'],
+                       'author_location': author_info['location'],
+                       'text': tweet.text,
+                       'created_at': tweet.created_at,
+                       'retweets': tweet.public_metrics['retweet_count'],
+                       'replies': tweet.public_metrics['reply_count'],
+                       'likes': tweet.public_metrics['like_count'],
+                       'quote_count': tweet.public_metrics['quote_count']
+                      })
+
+# Change this list of dictionaries into a dataframe
+df = pd.DataFrame(result)
+
+df
+
+df.to_csv("PPKM.csv")
+
+from google.colab import drive
+drive.mount('/content/gdrive')
+
+import os
+
+path = "gdrive/MyDrive/skripsi revisi/"
+os.listdir(path)
+
+df.to_csv(path+"PPKM1.csv")
+
+from google.colab import files
+files.download('PPKM.csv')
+
+data=df
+
+import string, re
+
+def cleansing(data):
+    # lower text
+    data = data.lower()
+    
+    # hapus punctuation
+    remove = string.punctuation
+    translator = str.maketrans(remove, ' '*len(remove))
+    data = data.translate(translator)
+    
+    # remove ASCII dan unicode
+    data = data.encode('ascii', 'ignore').decode('utf-8')
+    data = re.sub(r'[^\x00-\x7f]',r'', data)
+    data = re.sub(r"http\S+", '', data) # remove link
+    # remove newline
+    data = data.replace('\n', ' ')
+    
+    return data
+
+# jalankan cleansing data
+review = []
+for index, row in data.iterrows():
+    review.append(cleansing(row["text"]))
+    
+data['text'] = review
+data = pd.DataFrame(data)
+data.head()
+
+text=text[['author_location','text','created_at']]
+text
+
+def cleaningText(text):
+    text = re.sub(r'@[A-Za-z0-9]+', '', text) # remove mentions
+    text = re.sub(r'#[A-Za-z0-9]+', '', text) # remove hashtag
+    text = re.sub(r'RT[\s]', '', text) # remove RT
+    text = re.sub(r"http\S+", '', text) # remove link
+    text = re.sub(r'[0-9]+', '', text) # remove numbers
+
+    text = text.replace('\n', ' ') # replace new line into space
+    text = text.translate(str.maketrans('', '', string.punctuation)) # remove all punctuations
+    text = text.strip(' ') # remove characters space from both left and right text
+    return text 
+
+text['text'] = text['text'].apply(cleaningText)
+
+text
