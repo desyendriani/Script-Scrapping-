@@ -7,7 +7,7 @@ import pandas as pd
 
 import tweepy
 
-client = tweepy.Client(bearer_token = "AAAAAAAAAAAAAAAAAAAAADzHZgEAAAAATzwSRGLVQMn%2FlfknUiaWftPUYCg%3Dqyws7OS4Mye3FWpBwCKEUGyj8ODr1IJ49zCAIKC1toNPzOsJS1", wait_on_rate_limit=False)
+client = tweepy.Client(bearer_token = "XXXXXXX", wait_on_rate_limit=False)
 
 hoax_tweets[0].data[0]
 
